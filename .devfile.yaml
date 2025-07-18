@@ -78,4 +78,4 @@ commands:
     exec:
       label: 06. Run Native App
       component: quarkus-tools
-      commandLine: ./target/people-1.0-SNAPSHOT-runner -Dquarkus.http.port=8081
+      commandLine: ./target/people-1.0-SNAPSHOT-runner -Dquarkus.http.port=8081 
