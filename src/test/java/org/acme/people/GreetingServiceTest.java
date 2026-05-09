@@ -2,7 +2,8 @@ package org.acme.people;
 
 import jakarta.inject.Inject;
 
-import org.acme.people.service.Gold;
+import org.acme.people.service.Locale;
+import org.acme.people.service.Locale.Language;
 import org.acme.people.service.GreetingService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import io.quarkus.test.junit.QuarkusTest;
 public class GreetingServiceTest {
     
     @Inject
-    @Gold
+    @Locale(Language.EN)
     GreetingService service;
 
     @Test

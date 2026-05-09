@@ -1,10 +1,12 @@
 package org.acme.people;
 
+import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
 import org.acme.people.service.Greeting;
-import org.acme.people.service.GreetingService;
+import org.acme.people.service.Locale;
+import org.acme.people.service.Locale.Language;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -15,37 +17,40 @@ import io.quarkus.test.junit.QuarkusTest;
 public class GreetingTest {
 
     @Inject
-    Instance<Greeting> services;
+    @Any
+    Instance<Greeting> greetings;
 
     @Test
     public void testGreetings() {
         
-        if (services.isUnsatisfied()) {
+        if (greetings.isUnsatisfied()) {
             return;
         }
-        
-        // Assertions.assertTrue(services.select(GreetingService.class).get()
-        //     .greeting("Quarkus").startsWith("hello Quarkus"));
 
-        services.stream().forEach(s -> {
-            switch (s.getLocale()) {
-                case "en":
-                    Assertions.assertTrue("hello Quarkus".equals(s.greeting("Quarkus")));
-                    break;
+        greetings.stream().forEach(g -> {
+            Object realInstance = ClientProxy.unwrap(g);
+            Locale localeAnnotation = realInstance.getClass().getAnnotation(Locale.class);
+            Language localeValue = localeAnnotation != null ? localeAnnotation.value() : null;
 
-                case "it":
-                    Assertions.assertTrue("ciao Quarkus".equals(s.greeting("Quarkus")));
-                    break;
+            if (localeValue == null) {
+                throw new RuntimeException("No @Locale annotation found on: " + realInstance.getClass().getName());
+            }
 
-                case "es":
-                    Assertions.assertTrue("hola Quarkus".equals(s.greeting("Quarkus")));
+            switch (localeValue) {
+                case EN:
+                    Assertions.assertTrue("hello Quarkus".equals(g.greeting("Quarkus")));
                     break;
-            
+                case IT:
+                    Assertions.assertTrue("ciao Quarkus".equals(g.greeting("Quarkus")));
+                    break;
+                case ES:
+                    Assertions.assertTrue("hola Quarkus".equals(g.greeting("Quarkus")));
+                    break;
                 default:
-                    // throw new RuntimeException("Add a test case for your Greeting implementation: " + s.getClass().getName());
-                    Object realInstance = ClientProxy.unwrap(s);
-                    throw new RuntimeException("Add a test case for your Greeting implementation: " + realInstance.getClass().getName());
+                    throw new RuntimeException("Add a test case for your Greeting implementation: " +
+                            realInstance.getClass().getName());
             }
         });
+
     }
 }

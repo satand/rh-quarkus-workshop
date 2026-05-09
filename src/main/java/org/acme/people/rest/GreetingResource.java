@@ -1,10 +1,7 @@
 package org.acme.people.rest;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.Dependent;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -14,14 +11,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
-import java.util.List;
-
 import org.acme.people.service.Greeting;
-import org.acme.people.service.GreetingService;
+import org.acme.people.service.Locale;
+import org.acme.people.service.Locale.Language;
+import org.acme.people.service.Locale.Literal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.quarkus.arc.All;
 import io.smallrye.common.annotation.NonBlocking;
 
 @Path("/hello")
@@ -32,8 +28,12 @@ public class GreetingResource {
     public static final Logger log = LoggerFactory.getLogger(GreetingResource.class);
 
     @Inject
-    @All
-    List<Greeting> services;
+    @Any
+    Instance<Greeting> greetings;
+
+    @Inject
+    @Locale(Language.EN)
+    Greeting defaultGreeting;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -48,10 +48,16 @@ public class GreetingResource {
     @Path("/greeting/{name}")
     @NonBlocking
     public String greeting(@PathParam("name") String name, @QueryParam("locale") @DefaultValue("en") String locale) {
-        return services.stream()
-            .filter(s -> locale.equals(s.getLocale()))
-            .findFirst()
-            .orElse(services.stream().filter(s -> "en".equals(s.getLocale())).findFirst().get())
-            .greeting(name);
+        try {
+            Language language = Language.valueOf(locale.toUpperCase());
+            Instance<Greeting> selected = greetings.select(Literal.of(language));
+            if (selected.isResolvable()) {
+                return selected.get().greeting(name);
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("Unknown locale: {} - using default", locale);
+        }
+
+        return defaultGreeting.greeting(name);
     }
 }
