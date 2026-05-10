@@ -2,7 +2,7 @@ package org.acme.people.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
-@Locale(Locale.Language.ES)
+@Locale(Language.ES)
 @ApplicationScoped
 public class GreetingServiceES implements Greeting {
 

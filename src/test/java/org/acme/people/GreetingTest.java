@@ -6,7 +6,7 @@ import jakarta.inject.Inject;
 
 import org.acme.people.service.Greeting;
 import org.acme.people.service.Locale;
-import org.acme.people.service.Locale.Language;
+import org.acme.people.service.Language;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ public class GreetingTest {
             }
 
             switch (localeValue) {
-                case EN:
+                case EN, UNKNOWN:
                     Assertions.assertTrue("hello Quarkus".equals(g.greeting("Quarkus")));
                     break;
                 case IT:

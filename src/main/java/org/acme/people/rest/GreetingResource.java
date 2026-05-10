@@ -12,9 +12,9 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 import org.acme.people.service.Greeting;
+import org.acme.people.service.Language;
 import org.acme.people.service.Locale;
-import org.acme.people.service.Locale.Language;
-import org.acme.people.service.Locale.Literal;
+import org.acme.people.service.LocaleLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class GreetingResource {
 
     @Inject
     @Locale(Language.EN)
-    Greeting defaultGreeting;
+    Instance<Greeting> defaultGreeting;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -48,16 +48,13 @@ public class GreetingResource {
     @Path("/greeting/{name}")
     @NonBlocking
     public String greeting(@PathParam("name") String name, @QueryParam("locale") @DefaultValue("en") String locale) {
-        try {
-            Language language = Language.valueOf(locale.toUpperCase());
-            Instance<Greeting> selected = greetings.select(Literal.of(language));
-            if (selected.isResolvable()) {
-                return selected.get().greeting(name);
-            }
-        } catch (IllegalArgumentException e) {
-            log.warn("Unknown locale: {} - using default", locale);
-        }
 
-        return defaultGreeting.greeting(name);
+        Instance<Greeting> greeting = greetings.select(LocaleLiteral.of(Language.fromString(locale)));
+
+        if (greeting.isUnsatisfied()) {
+            greeting = defaultGreeting;
+        }
+        
+        return greeting.get().greeting(name);
     }
 }

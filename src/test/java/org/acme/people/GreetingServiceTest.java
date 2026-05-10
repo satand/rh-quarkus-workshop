@@ -3,7 +3,7 @@ package org.acme.people;
 import jakarta.inject.Inject;
 
 import org.acme.people.service.Locale;
-import org.acme.people.service.Locale.Language;
+import org.acme.people.service.Language;
 import org.acme.people.service.GreetingService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
