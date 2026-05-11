@@ -57,4 +57,15 @@ public class GreetingResource {
         
         return greeting.get().greeting(name);
     }
+
+    @GET
+    @Path("/lastletter/{name}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @NonBlocking
+    public String lastLetter(@PathParam("name") String name) {
+        int len = name.length();
+        String lastLetter = name.substring(len-1);
+        log.info("Got last letter: " + lastLetter);
+        return lastLetter;
+    }
 }
