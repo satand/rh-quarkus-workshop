@@ -143,9 +143,36 @@
             </activation>
             <properties>
                 <skipITs>false</skipITs>
-                <quarkus.native.enabled>true</quarkus.native.enabled>
+                <quarkus.native.enabled>true</quarkus.native.enabled> <!-- Old way: <quarkus.package.type>native</quarkus.package.type> -->
                 <!-- <quarkus.native.container-build>true</quarkus.native.container-build> -->
+                <!-- <quarkus.native.container-runtime>podman</quarkus.native.container-runtime>  --> <!-- Possibile alternative: docker (default), podman -->
                 <!-- <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21</quarkus.native.builder-image> -->
+            </properties>
+        </profile>
+        <profile>
+            <id>legacy-jar</id>
+            <activation>
+                <property>
+                    <name>legacy-jar</name>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>true</skipITs>
+                <quarkus.package.jar.enabled>true</quarkus.package.jar.enabled>
+                <quarkus.package.jar.type>legacy-jar</quarkus.package.jar.type> <!-- Possibile alternative: fast-jar (default),legacy-jar,uber-jar,mutable-jar -->
+            </properties>
+        </profile>
+        <profile>
+            <id>uber-jar</id>
+            <activation>
+                <property>
+                    <name>uber-jar</name>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>true</skipITs>
+                <quarkus.package.jar.enabled>true</quarkus.package.jar.enabled>
+                <quarkus.package.jar.type>uber-jar</quarkus.package.jar.type> <!-- Possibile alternative: fast-jar (default),legacy-jar,uber-jar,mutable-jar -->
             </properties>
         </profile>
     </profiles>
