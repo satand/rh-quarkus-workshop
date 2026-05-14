@@ -2,12 +2,12 @@ package org.acme.people.health;
 
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
-import org.eclipse.microprofile.health.Readiness;
+import org.eclipse.microprofile.health.Liveness;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-@Readiness
+@Liveness
 public class SimpleHealthCheck implements HealthCheck {
 
     @Override
