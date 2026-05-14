@@ -9,12 +9,19 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
+
+import java.util.Map;
 
 import org.acme.people.service.Greeting;
 import org.acme.people.service.Language;
 import org.acme.people.service.Locale;
 import org.acme.people.service.LocaleLiteral;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +46,17 @@ public class GreetingResource {
     @Produces(MediaType.TEXT_PLAIN)
     @NonBlocking
     public String hello() {
+
+        // return Response.status(Response.Status.OK)
+        //     .entity("Hello from Quarkus REST")
+        //     .header("X-Custom-Header", "my-value")
+        //     .build();
+
+        // return RestResponse.ResponseBuilder
+        //     .ok("Hello from Quarkus REST")
+        //     .header("X-Custom-Header", "my-value")
+        //     .build();
+
         // log.info("----> {} {}", this);
         return "Hello from Quarkus REST";
     }
@@ -67,5 +85,23 @@ public class GreetingResource {
         String lastLetter = name.substring(len-1);
         log.info("Got last letter: " + lastLetter);
         return lastLetter;
+    }
+
+    @GET
+    @Path("/lastLetterQueryParam")
+    @Produces(MediaType.TEXT_PLAIN)
+    @NonBlocking
+    public String lastLetterQueryParam(@QueryParam("name") String name) {
+        int len = name.length();
+        String lastLetter = name.substring(len-1);
+        log.info("Got last letter: " + lastLetter);
+        return lastLetter;
+    }
+
+    @ServerExceptionMapper
+    public Response handleIllegalArgument(NullPointerException e) {
+        return Response.status(500)
+                .entity(Map.of("error", e.getMessage()))
+                .build();
     }
 }
