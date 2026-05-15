@@ -15,11 +15,13 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.acme.people.service.Greeting;
 import org.acme.people.service.Language;
 import org.acme.people.service.Locale;
 import org.acme.people.service.LocaleLiteral;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import org.slf4j.Logger;
@@ -42,6 +44,12 @@ public class GreetingResource {
     @Locale(Language.EN)
     Instance<Greeting> defaultGreeting;
 
+    @ConfigProperty(name = "greeting.message", defaultValue = "Hello")
+    String message;
+
+    @ConfigProperty(name = "greeting.name")
+    Optional<String> name;
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @NonBlocking
@@ -58,7 +66,7 @@ public class GreetingResource {
         //     .build();
 
         // log.info("----> {} {}", this);
-        return "Hello from Quarkus REST";
+        return message + " from " + name.orElse("Quarkus REST");
     }
 
     @GET
